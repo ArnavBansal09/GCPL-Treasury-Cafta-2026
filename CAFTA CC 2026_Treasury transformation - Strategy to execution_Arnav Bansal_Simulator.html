@@ -1,0 +1,1133 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>GCPL Treasury Command Centre</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap">
+<style>
+:root{
+  /* Layout: white slide-style header under the slanted yellow band (as on every deck slide); the Cockpit opens on a charcoal stage where 21 treasuries resolve into One Treasury, beside six KPI tiles; panels follow in a 12-column grid with dark header bars, as in the deck. */
+  /* One light theme on purpose, matching the deck and the Excel annex: white and light grey, charcoal ink and header bars, EY-style yellow as the single accent, red for what today costs, green for what we deliver. */
+  color-scheme:light;
+  --y:#FFE600; --y-ink:#2E2E38; --y-wash:rgba(255,230,0,.38); --y-soft:#FFF5B8; --y-xl:#FFFBE0;
+  --blue:#6B6B73; --blue-wash:rgba(255,230,0,.34);
+  --bg:#F2F2F2; --panel:#FFFFFF; --fg:#2E2E38; --muted:#5F5F69; --faint:#8C8C96; --line:#DEDEE4; --soft:#F2F2F2; --track:#E6E6E6;
+  --dk:#404040; --mid:#7F7F7F;
+  --good:#168742; --good-fill:#2DB757; --good-bg:#E3F5E8;
+  --bad:#C8261C; --bad-fill:#E8382D; --bad-bg:#FDE4E2;
+  --warn:#8A5600; --warn-fill:#F2A900; --warn-bg:#FFF1CC;
+  --cmd:#FFFFFF; --cmd-2:#F2F2F2; --cmd-ink:#2E2E38; --cmd-muted:#6B6B73; --cmd-line:#DEDEE4;
+  --stage:#2E2E38; --stage-ink:#FFFFFF; --stage-muted:#C2C2CC; --stage-line:rgba(255,255,255,.10);
+  --stage-blue:#FFFFFF; --stage-good:#5BD88C; --stage-bad:#FF6B5F; --stage-grey:#9A9AA6;
+  --shadow:0 1px 2px rgba(46,46,56,.06),0 10px 24px -20px rgba(46,46,56,.45);
+  --bar-strong:#2E2E38; --bar-soft:#9A9AA6;
+  --f:"Lato",Calibri,Carlito,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --r:8px; --r-s:6px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f);font-size:14px;line-height:1.45;margin:0;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tn{font-variant-numeric:tabular-nums}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.in{max-width:1480px;margin:0 auto}
+
+/* ---------- command bar ---------- */
+.cmd{background:var(--cmd);color:var(--cmd-ink);position:relative;border-bottom:2px solid var(--y)}
+.cmd .in{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px;padding-block:16px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.mark{width:38px;height:28px;flex:none;background:var(--y);clip-path:polygon(0 40%,100% 0,100% 100%,0 100%)}
+.brand .eye{display:block;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--cmd-muted)}
+.brand strong{display:block;font-weight:300;font-size:clamp(23px,2.5vw,32px);line-height:1.12;letter-spacing:.005em}
+.switch{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--cmd-2);border:1px solid var(--cmd-line);border-radius:999px;padding:4px;width:min(380px,100%)}
+.switch button{all:unset;position:relative;z-index:1;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:7px 14px;border-radius:999px;color:var(--cmd-muted);text-align:center;transition:color .35s}
+.switch button b{font-weight:900;font-size:13.5px;letter-spacing:.03em}
+.switch button small{font-size:11.5px}
+.switch button[aria-pressed="true"]{color:var(--y-ink)}
+.switch button:not([aria-pressed="true"]):hover{color:var(--fg)}
+.switch button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.switch .thumb{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--y);box-shadow:0 2px 8px -2px rgba(46,46,56,.35);transition:transform .55s cubic-bezier(.65,0,.25,1)}
+.switch[data-mode="target"] .thumb{transform:translateX(100%)}
+.switch.dim{opacity:.4;pointer-events:none}
+.asof{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12.5px;color:var(--cmd-muted);text-align:right}
+.asof b{color:var(--cmd-ink);font-weight:700}
+.live{display:inline-flex;align-items:center;gap:8px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--good-fill);flex:none}
+.live.bad i{background:var(--bad-fill)}
+.band{height:12px;background:var(--y);clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%);transform-origin:left center}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px;padding-block:20px 16px}
+.tabs{display:flex;flex-wrap:nowrap;max-width:100%;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.tab{all:unset;cursor:pointer;padding:8px 16px;border-radius:999px;font-weight:900;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:background-color .25s,color .25s}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--y);color:var(--y-ink)}
+.tab:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.prov{font-size:12.5px;color:var(--muted)}
+.prov b{color:var(--fg)}
+
+/* ---------- grid & panels ---------- */
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);min-width:0}
+.ph{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 14px;margin:-18px -20px 16px;padding:11px 20px;background:var(--dk);color:#FFFFFF;border-radius:var(--r) var(--r) 0 0}
+.ph h3{margin:0;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.ph .sub{font-size:12.5px;color:#D6D6DE}
+.ph .sub b{color:#FFFFFF}
+.ph .reset{color:#FFFFFF;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fadeUp{from{opacity:.001;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:900;padding:3px 9px 3px 7px;border-radius:999px;width:max-content;max-width:100%;white-space:nowrap;line-height:1.3}
+.chip svg{width:12px;height:12px;flex:none}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.neutral{background:var(--soft);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+
+/* ---------- stage (hero) ---------- */
+.stage{grid-column:1/8;position:relative;min-height:470px;border-radius:var(--r);overflow:hidden;display:grid;grid-template-columns:minmax(0,.39fr) minmax(0,.61fr);grid-template-rows:auto 1fr auto;color:var(--stage-ink);
+  background:linear-gradient(160deg,#34343F 0%,var(--stage) 55%,#292931 100%);box-shadow:var(--shadow)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage .top,.stage .bot{position:relative;z-index:1;pointer-events:none;padding:22px 8px 22px 24px;grid-column:1}
+.stage .top{grid-row:1}
+.stage .net{grid-column:2;grid-row:1/4;min-height:420px}
+.stage .eye{font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--y)}
+.stage h2{margin:6px 0 0;font-weight:300;font-size:clamp(21px,2.2vw,29px);line-height:1.14;max-width:21ch;text-wrap:balance}
+.stage .bot{grid-row:3;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.hero{display:flex;flex-direction:column;gap:4px}
+.hero .lab{font-size:11.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--stage-muted)}
+.hero .num{font-weight:900;font-size:clamp(38px,4.6vw,56px);line-height:1;letter-spacing:-.015em;transition:color .6s}
+.hero .num.bad{color:var(--stage-bad)} .hero .num.good{color:var(--stage-good)}
+.hero .cap{font-size:13px;color:var(--stage-muted);max-width:32ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--stage-muted);max-width:300px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.legend i.sq{border-radius:2px}
+.legend i.ring{background:transparent;box-shadow:inset 0 0 0 2px var(--stage-ink)}
+.tip{position:absolute;z-index:3;pointer-events:none;background:rgba(10,10,14,.92);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.35;max-width:240px;transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .15s}
+.tip b{display:block;font-size:13px}
+.tip span{color:#C9C9D6}
+.tip.on{opacity:1}
+
+/* ---------- KPI tiles ---------- */
+.kpis{grid-column:8/13;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.kpi{display:flex;flex-direction:column;gap:7px;padding:16px 16px 15px;border-top:4px solid var(--y)}
+.kpi .l{font-size:11.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:clamp(25px,2.3vw,31px);font-weight:900;line-height:1.02;letter-spacing:-.01em;white-space:nowrap}
+.kpi .d{font-size:12.5px;color:var(--muted);min-height:2.7em}
+.kpi .chip{margin-top:auto}
+.meter{position:relative;height:6px;border-radius:999px;background:var(--track)}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;width:0;transition:width 1s cubic-bezier(.2,.75,.2,1),background-color .6s}
+.meter .goal{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:2px;background:var(--fg)}
+
+/* ---------- placements ---------- */
+.p-ent{grid-column:1/8;grid-row:span 2;display:flex;flex-direction:column}
+.p-fc{grid-column:8/13}
+.p-bk{grid-column:8/13}
+.p-pay{grid-column:1/6}
+.p-al{grid-column:6/13}
+
+/* entity table */
+.sum{display:flex;flex-wrap:wrap;gap:8px 26px;padding:12px 14px;background:var(--soft);border-radius:var(--r-s);margin-bottom:12px;font-size:12.5px;color:var(--muted)}
+.sum b{display:block;font-size:19px;font-weight:900;color:var(--fg);letter-spacing:-.01em}
+.sum .hl b{color:var(--bad)}
+.sum .hl.good b{color:var(--good)}
+.tbox{overflow:auto;max-height:640px;flex:1;min-height:0;border-radius:var(--r-s);-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),transparent)}
+.tbox.end{-webkit-mask-image:none;mask-image:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1}
+td{padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.grp td{background:var(--soft);font-weight:900;font-size:12px;color:var(--fg);white-space:normal;padding-block:8px}
+tr.grp td small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+td.ccy{color:var(--muted);font-size:12px}
+td.z{color:var(--faint)}
+td .chip{font-size:11px;padding:2px 8px 2px 6px}
+td.flash{animation:flash 1.3s ease-out}
+@keyframes flash{0%{background:var(--y-wash)}100%{background:transparent}}
+.dotc{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:1px}
+
+/* forecast */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--faint);font-family:var(--f);font-size:11px}
+.chart .grid-l{stroke:var(--line);stroke-width:1}
+.keys{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);margin-top:8px}
+.keys span{display:inline-flex;align-items:center;gap:7px}
+.keys i{display:inline-block;width:18px;height:0;border-top:2.5px solid var(--fg)}
+.keys i.fc{border-top:2.5px dashed var(--blue)}
+.keys i.band{height:10px;border:0;background:var(--y-soft);border-radius:2px}
+.ctip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:10px;padding:8px 10px;font-size:12px;min-width:140px;opacity:0;transition:opacity .12s;transform:translate(-50%,-100%)}
+.ctip.on{opacity:1}
+.ctip .row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.ctip .row b{font-size:13.5px}
+.ctip .k{display:inline-block;width:14px;border-top:2.5px solid var(--fg)}
+.ctip .k.fc{border-top-style:dashed;border-top-color:var(--blue)}
+details.tv{margin-top:10px;font-size:12.5px;color:var(--muted)}
+details.tv summary{cursor:pointer;font-weight:700}
+details.tv table{margin-top:8px;font-size:12px}
+
+/* banks */
+.bank{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.5fr) auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.bank:last-child{border-bottom:0}
+.bank .nm{font-weight:700;font-size:13px;line-height:1.2;min-width:0}
+.bank .nm small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.trk{position:relative;height:10px;border-radius:999px;background:var(--track)}
+.trk .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;width:0;transition:width 1s cubic-bezier(.2,.75,.2,1)}
+.trk .lim{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--fg);border-radius:2px}
+.trk.hatch .fill{background:repeating-linear-gradient(135deg,var(--faint) 0 3px,transparent 3px 7px)}
+.bank .val{font-size:12.5px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bank .val b{font-weight:900}
+
+/* payments */
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.stat .l{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-size:24px;font-weight:900;letter-spacing:-.01em}
+.note{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.note b{color:var(--fg)}
+
+/* alerts */
+.alerts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.alerts li{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:12px;align-items:start;font-size:13.5px;padding:10px 12px;border-radius:var(--r-s);background:var(--soft)}
+.alerts time{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* ---------- liquidity ---------- */
+.pools{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.pool{border-top:4px solid var(--y)}
+.pool h4{margin:0;font-size:17px;font-weight:900}
+.pool .why{font-size:12.5px;color:var(--muted);margin:4px 0 12px;min-height:3.8em}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--stage);color:#FFFFFF;border-radius:var(--r-s);padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden}
+.hdr::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--y)}
+.hdr.blue::after{background:var(--y)}
+.hdr small{display:block;color:var(--stage-muted);font-size:11.5px}
+.hdr .amt{font-size:21px;font-weight:900;color:var(--y)}
+.hdr.blue .amt{color:var(--y)}
+.hdr.none{background:var(--soft);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.hdr.none::after{background:var(--bad-fill)}
+.hdr.none small{color:var(--muted)}
+.hdr.none .amt{color:var(--bad)}
+.mem{display:grid;grid-template-columns:minmax(0,1fr) auto 64px;gap:10px;align-items:center;font-size:13px;padding:6px 2px;border-bottom:1px dashed var(--line)}
+.mem:last-child{border-bottom:0}
+.mem .n{font-weight:700}
+.flow{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.flow svg{width:34px;height:10px;flex:none;overflow:visible}
+.flow line{stroke-width:2;stroke-linecap:round;stroke-dasharray:3 5;animation:dash 1.1s linear infinite}
+.flow.in line{stroke:var(--y-ink)}
+.flow.blue line{stroke:var(--mid)}
+.flow.gold line{stroke:var(--good-fill)}
+@keyframes dash{to{stroke-dashoffset:-16}}
+.p-net{grid-column:1/8}
+.p-guard{grid-column:8/13}
+.bars{display:grid;gap:12px}
+.bar2{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:13px}
+.bar2 .trk{height:14px}
+.bar2 .v{text-align:right;font-weight:900;font-variant-numeric:tabular-nums}
+.guard{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.guard li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;font-size:13px}
+.guard b{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding-top:1px}
+
+/* ---------- simulator ---------- */
+.p-in{grid-column:1/6}
+.p-out{grid-column:6/13;display:flex;flex-direction:column;gap:18px}
+.presets{display:flex;flex-wrap:wrap;gap:4px;background:var(--soft);border-radius:999px;padding:4px;margin-bottom:16px;box-shadow:inset 0 0 0 1px var(--line)}
+.presets button{all:unset;cursor:pointer;flex:1;text-align:center;padding:7px 10px;border-radius:999px;font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:background-color .25s,color .25s}
+.presets button[aria-pressed="true"]{background:var(--y);color:var(--y-ink)}
+.presets button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.presets button.custom{cursor:default}
+.sl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;margin-bottom:14px}
+.sl label{font-size:13px;font-weight:700}
+.sl output{font-size:13.5px;font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+.sl .rw{grid-column:1/-1;position:relative}
+.sl small{grid-column:1/-1;color:var(--muted);font-size:11.5px}
+.sl .bt{position:absolute;top:2px;bottom:2px;width:2px;margin-left:-1px;background:var(--faint);border-radius:2px;pointer-events:none}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;margin:0;display:block;position:relative;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--fg) 0 var(--p,50%),var(--track) var(--p,50%) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--y);border:2px solid var(--fg);margin-top:-6px;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:transform .15s}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15)}
+input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:var(--track)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:999px;background:var(--fg)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--y);border:2px solid var(--fg)}
+.speed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);border-radius:var(--r-s);padding:4px;box-shadow:inset 0 0 0 1px var(--line)}
+.speed button{all:unset;cursor:pointer;text-align:center;padding:6px 6px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.speed button[aria-pressed="true"]{background:var(--panel);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.speed button:focus-visible{outline:2px solid var(--fg);outline-offset:1px}
+.reset{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.reset:focus-visible{outline:2px solid var(--fg)}
+.mets{display:grid;grid-template-columns:1.25fr repeat(3,minmax(0,1fr));gap:12px}
+.met{background:var(--soft);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.met .l{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.met .v{font-size:24px;font-weight:900;letter-spacing:-.01em;white-space:nowrap;transition:color .4s}
+.met .s{font-size:12px;color:var(--muted)}
+.met.lead{background:var(--stage);color:#FFFFFF}
+.met.lead .l,.met.lead .s{color:var(--stage-muted)}
+.met.lead .v{font-size:34px;color:var(--y)}
+.v.neg{color:var(--bad)}
+.met.lead .v.neg{color:var(--stage-bad)}
+.lev{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr) 58px;gap:12px;align-items:center;font-size:13px;padding:4px 0}
+.lev .trk{height:12px}
+.lev .trk .fill{background:var(--mid)}
+.lev .trk .fill.l1{background:var(--y);box-shadow:inset 0 0 0 1px rgba(46,46,56,.25)}
+.lev .num{text-align:right;font-weight:900;font-variant-numeric:tabular-nums}
+.lev .bt{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--fg);border-radius:2px}
+.subh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px}
+.subh h4{margin:0;font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;padding-bottom:4px;box-shadow:inset 0 -3px 0 var(--y)}
+.subh span{font-size:12px;color:var(--muted)}
+.subh .bk{display:inline-block;width:2px;height:10px;background:var(--fg);vertical-align:-1px;margin-right:4px}
+.range{position:relative;height:56px;margin-top:6px}
+.range .ax{position:absolute;left:0;right:0;top:21px;height:8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.range .tk{position:absolute;top:14px;width:2px;height:22px;margin-left:-1px;background:var(--faint)}
+.range .tl{position:absolute;top:38px;transform:translateX(-50%);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.range .tl b{color:var(--fg)}
+.range .dot{position:absolute;top:13px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:var(--y);border:3px solid var(--fg);box-shadow:0 4px 14px -4px rgba(0,0,0,.4);transition:left .6s cubic-bezier(.2,.75,.2,1)}
+.range .dl{position:absolute;top:-6px;transform:translateX(-50%);font-size:12px;font-weight:900;white-space:nowrap;transition:left .6s cubic-bezier(.2,.75,.2,1)}
+.tor{display:grid;gap:9px;margin-top:6px}
+.tr{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:12px;align-items:center;font-size:13px}
+.tr .nm{line-height:1.25}
+.tr .nm small{display:block;color:var(--muted);font-size:11.5px}
+.tt{position:relative;height:24px}
+.tt::before{content:"";position:absolute;left:50%;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--fg);opacity:.55;border-radius:2px}
+.tt i{position:absolute;top:5px;height:14px;width:0;transition:width .45s cubic-bezier(.2,.75,.2,1)}
+.tt i.lo{right:50%;background:var(--bad-fill);border-radius:4px 0 0 4px}
+.tt i.hi{left:50%;background:var(--good-fill);border-radius:0 4px 4px 0}
+.tt b{position:absolute;top:3px;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;transition:left .45s cubic-bezier(.2,.75,.2,1),right .45s cubic-bezier(.2,.75,.2,1)}
+.tt b.vl{color:var(--bad)} .tt b.vh{color:var(--good)}
+.foot{font-size:12px;color:var(--muted);padding-block:22px 34px;max-width:110ch}
+.foot b{color:var(--fg)}
+
+@media (max-width:1180px){
+  .stage,.kpis,.p-ent,.p-fc,.p-bk,.p-pay,.p-al,.p-net,.p-guard,.p-in,.p-out{grid-column:1/-1;grid-row:auto}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pools{grid-template-columns:1fr}
+  .pool .why{min-height:0}
+  .asof{align-items:flex-start;text-align:left}
+}
+@media (max-width:700px){
+  .xl{display:none}
+  .stage{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 310px auto;min-height:0}
+  .stage .net{grid-column:1;grid-row:2;min-height:0}
+  .stage .top,.stage .bot{padding:18px 18px 8px}
+  .stage .bot{padding-bottom:20px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .kpi{padding:14px 13px 13px}
+  .alerts li{grid-template-columns:minmax(0,1fr)}
+  .bank{grid-template-columns:minmax(0,1fr) auto}
+  .bank .trk{grid-column:1/-1;grid-row:2}
+  .mets{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .met.lead,.met:last-child{grid-column:1/-1}
+  .lev{grid-template-columns:minmax(0,1fr) 58px}
+  .tr{grid-template-columns:minmax(0,1fr)}
+  .lev .trk{grid-column:1/-1;grid-row:2}
+  .bar2{grid-template-columns:minmax(0,1fr) 64px}
+  .bar2 .trk{grid-column:1/-1;grid-row:2}
+  .guard li{grid-template-columns:minmax(0,1fr)}
+  .switch{width:100%}
+}
+@media (prefers-reduced-motion:no-preference){
+  .band{animation:sweep .9s cubic-bezier(.65,0,.25,1) both}
+  .live i{animation:pulse 2.2s infinite}
+  .live.bad i{animation-name:pulseBad}
+}
+@keyframes sweep{from{transform:scaleX(.02)}to{transform:scaleX(1)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,183,87,.6)}70%{box-shadow:0 0 0 9px rgba(45,183,87,0)}100%{box-shadow:0 0 0 0 rgba(45,183,87,0)}}
+@keyframes pulseBad{0%{box-shadow:0 0 0 0 rgba(232,56,45,.6)}70%{box-shadow:0 0 0 9px rgba(232,56,45,0)}100%{box-shadow:0 0 0 0 rgba(232,56,45,0)}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+
+<div class="band" aria-hidden="true"></div>
+<header class="cmd">
+  <div class="in gut">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div><span class="eye">GCPL · One Treasury</span><strong>Treasury Command Centre</strong></div>
+    </div>
+    <div class="switch" id="switch" role="group" aria-label="Operating state" data-mode="target">
+      <span class="thumb" aria-hidden="true"></span>
+      <button id="m-today" type="button" aria-pressed="false"><b>Today</b><small>21 treasuries</small></button>
+      <button id="m-target" type="button" aria-pressed="true"><b>Year 3</b><small>One Treasury</small></button>
+    </div>
+    <div class="asof"><span class="live" id="live"><i aria-hidden="true"></i><span id="feed"></span></span><span>Cash position as of <b id="asof"></b></span></div>
+  </div>
+</header>
+
+<div class="in gut">
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="t-cockpit" aria-controls="view" aria-selected="true" type="button">Cockpit</button>
+      <button class="tab" role="tab" id="t-liquidity" aria-controls="view" aria-selected="false" type="button">Liquidity<span class="xl"> structure</span></button>
+      <button class="tab" role="tab" id="t-simulator" aria-controls="view" aria-selected="false" type="button"><span class="xl">Value </span>Simulator</button>
+    </div>
+    <div class="prov">Prototype · <b>₹ crore</b> · illustrative data reconciled to the Excel annex (tabs E1–E3, F)</div>
+  </div>
+  <main id="view" role="tabpanel" aria-live="polite"></main>
+  <p class="foot"><b>Student prototype</b> by Arnav Bansal, Abhinav Mishra and Anmol Sumra for the EY CAFTA Case Championship 2026 (Treasury transformation: Strategy to execution). GCPL is the case company; entity names and balances are illustrative. Totals reconcile to the business case in the deck (p. 13–14) and the Excel annex: ₹877 Cr of cash sits idle today while the group borrows; the Year-3 view uses the Annex E2 phasing, and the value simulator runs the Annex E3 formulas.</p>
+</div>
+
+<script>
+(function () {
+"use strict";
+const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+const $ = (s, r) => (r || document).querySelector(s);
+const view = $("#view");
+const TABS = ["cockpit", "liquidity", "simulator"];
+const state = { mode: "target", tab: "cockpit" };
+let firstVisit = false;
+try { firstVisit = !localStorage.getItem("gcpl-tcc-v3"); } catch (e) {}
+try { const s = JSON.parse(localStorage.getItem("gcpl-tcc-v3") || "{}"); if (s.mode === "today" || s.mode === "target") state.mode = s.mode; if (TABS.includes(s.tab)) state.tab = s.tab; } catch (e) {}
+const hash = (location.hash || "").slice(1);
+if (hash === "today" || hash === "target") state.mode = hash;
+if (TABS.includes(hash)) state.tab = hash;
+const save = () => { try { localStorage.setItem("gcpl-tcc-v3", JSON.stringify({ mode: state.mode, tab: state.tab })); } catch (e) {} };
+
+/* ---------- formatting ---------- */
+const fmt = (n, d = 0) => Number(n).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+const rs = (n, d = 0) => (n < -0.0499 ? "−₹" : "₹") + fmt(Math.abs(n), d);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const IC = {
+  good: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  bad: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2l6.3 11.3H1.7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 6.4v3.3M8 11.7v.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>',
+  warn: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 4.8v3.6M8 10.9v.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>',
+  neutral: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 7.4v3.8M8 4.9v.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>'
+};
+const chip = (cls, txt) => '<span class="chip ' + cls + '">' + IC[cls] + esc(txt) + "</span>";
+const memo = {};
+function glide(el, key, to, f, dur, from) {
+  if (!el) return;
+  const start = from !== undefined ? from : (key in memo ? memo[key] : to);
+  memo[key] = to;
+  if (reduce || Math.abs(start - to) < 1e-9) { el.textContent = f(to); return; }
+  const tok = {}; el._tw = tok;
+  const t0 = performance.now(), D = dur || 950;
+  const step = now => {
+    if (el._tw !== tok) return;
+    const k = Math.min(1, Math.max(0, (now - t0) / D)), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = f(start + (to - start) * e);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  el.textContent = f(start);
+  requestAnimationFrame(step);
+}
+const later = fn => requestAnimationFrame(() => requestAnimationFrame(fn));
+
+/* ---------- business case engine (Annex E2/E3 formulas, constants from Annex E1) ---------- */
+const K = { OSCash: 1140, OSDebt: 1500, L1bApplied: 300, Lev1b: 2.25, BufferTheory: 0.264019927806013, L3Struct: 1.95733333333333, L3Price: 1.35,
+  ImportVol: 900, ICFlows: 1200, ICNettable: 0.7, CentralFX: 0.6, ICFXCost: 0.0025, Investable: 1425, Lev6: 1.6275,
+  OneTime: 14.06, Recur: 4.82, OneTimeY1: 0.7, RecurY1: 0.7, Tax: 0.2517, PhasedL6: [-1.89, -0.76125, 1.6275, 1.6275, 1.6275] };
+const RAMPS = { slow: [0, 0.35, 0.75, 0.95, 1], plan: [0.0994174194917387, 0.608278633107141, 0.936010293689396, 1, 1], fast: [0.1, 0.7, 1, 1, 1] };
+const PRESET = {
+  bear: { sp: 2.0, tr: 35, om: 35, br: 15, fx: 5, nc: 55, yu: 15, fp: 0.5, cm: 1.3, ramp: "slow", wacc: 11 },
+  base: { sp: 2.9, tr: 25, om: 30, br: 25, fx: 10, nc: 60, yu: 30, fp: 1.0, cm: 1.0, ramp: "plan", wacc: 11 },
+  bull: { sp: 4.0, tr: 15, om: 25, br: 30, fx: 15, nc: 80, yu: 45, fp: 1.5, cm: 0.9, ramp: "fast", wacc: 11 }
+};
+function model(p) {
+  const sp = p.sp / 100, tr = p.tr / 100, om = p.om / 100, br = Math.min(p.br / 100, K.BufferTheory), fx = p.fx / 10000, nc = p.nc / 100, yu = p.yu / 10000;
+  const a1 = Math.max(0, Math.min(K.OSCash * (1 - om - tr), K.OSDebt));
+  const a2 = K.OSCash * om * (1 - tr) * br;
+  const L = [
+    ["Pooling via the in-house bank", a1 * sp],
+    ["India INR pool", K.Lev1b],
+    ["Smaller pooled buffers", a2 * sp],
+    ["Banks and accounts", K.L3Struct + K.L3Price * p.fp],
+    ["FX execution and netting", (K.ImportVol + K.ICFlows * (1 - K.ICNettable * nc)) * K.CentralFX * fx + K.ICFlows * K.ICNettable * nc * K.ICFXCost],
+    ["Central investing", Math.max(0, K.Investable - a1 - K.L1bApplied - a2) * yu],
+    ["Staff time, net of new roles", K.Lev6]
+  ];
+  const gross = L.reduce((s, l) => s + l[1], 0), recur = K.Recur * p.cm, ramp = RAMPS[p.ramp];
+  const cf = [], cum = []; let c = 0, npv = 0;
+  for (let t = 0; t < 5; t++) {
+    const ot = t === 0 ? K.OneTime * p.cm * K.OneTimeY1 : (t === 1 ? K.OneTime * p.cm * (1 - K.OneTimeY1) : 0);
+    const rc = t === 0 ? recur * K.RecurY1 : recur;
+    const f = (gross - K.Lev6) * ramp[t] + K.PhasedL6[t] - ot - rc;
+    cf.push(f); c += f; cum.push(c); npv += f / Math.pow(1 + p.wacc / 100, t + 1);
+  }
+  let pay = null;
+  for (let t = 0; t < 5; t++) if (cum[t] >= 0) { pay = t === 0 ? 1 : t + (-cum[t - 1]) / cf[t]; break; }
+  return { L, gross, recur, net: gross - recur, liq: a1 + K.L1bApplied + a2, npv, npvPT: npv * (1 - K.Tax), cf, cum, pay, a1, a2 };
+}
+const BASE = model(PRESET.base), BEAR = model(PRESET.bear), BULL = model(PRESET.bull);
+const Y3 = { overlap: BASE.liq - BASE.a1 * 0.9 - K.L1bApplied - BASE.a2 * 0.9, nis: BASE.L[0][1] * 0.9 + K.Lev1b + BASE.L[2][1] * 0.9 };
+
+/* ---------- entities: [pool, name, ccy, cash today, debt today, cash full, debt full, visible today, feed today, feed Year 3] ---------- */
+const ENT = [
+  ["inr", "GCPL Ltd (parent), Mumbai", "INR", 1410, 2900, 1410, 2600, 700, "partial", "t0"],
+  ["inr", "GCPL Personal Care Pvt Ltd", "INR", 110, 0, 0, 0, 0, "stale", "swept"],
+  ["inr", "GCPL Home Care Pvt Ltd", "INR", 90, 0, 0, 0, 0, "stale", "swept"],
+  ["inr", "GCPL Distribution Pvt Ltd", "INR", 60, 0, 0, 0, 0, "stale", "swept"],
+  ["inr", "GCPL Exports Pvt Ltd", "INR", 40, 0, 0, 0, 0, "stale", "swept"],
+  ["grc", "GCPL Treasury Centre IFSC (GRCTC)", "USD", 0, 0, 0, 523, 0, "none", "t0"],
+  ["grc", "GCPL UK Ltd", "GBP", 160, 0, 52, 0, 160, "t0", "t0"],
+  ["grc", "GCPL Brands UK Ltd", "GBP", 60, 200, 20, 0, 0, "stale", "t0"],
+  ["grc", "GCPL USA Inc", "USD", 150, 0, 49, 0, 150, "t0", "t0"],
+  ["grc", "GCPL Distribution USA LLC", "USD", 70, 400, 23, 0, 0, "stale", "t0"],
+  ["grc", "GCPL Middle East FZE, Dubai", "AED", 70, 0, 23, 0, 0, "stale", "t0"],
+  ["grc", "GCPL Canada Inc", "CAD", 45, 100, 15, 0, 45, "t0", "t0"],
+  ["grc", "GCPL Ireland Ltd", "EUR", 40, 0, 13, 0, 0, "stale", "t0"],
+  ["grc", "GCPL Deutschland GmbH", "EUR", 85, 250, 28, 0, 85, "t0", "t0"],
+  ["grc", "GCPL France SAS", "EUR", 55, 150, 18, 0, 0, "stale", "t0"],
+  ["grc", "GCPL Italia Srl", "EUR", 45, 0, 15, 0, 0, "stale", "t0"],
+  ["grc", "GCPL España SL", "EUR", 40, 0, 13, 0, 0, "stale", "t0"],
+  ["grc", "GCPL Nederland BV", "EUR", 35, 0, 9, 0, 0, "stale", "t0"],
+  ["loc", "GCPL Brasil Ltda", "BRL", 110, 200, 110, 200, 0, "stale", "t0"],
+  ["loc", "GCPL South Africa (Pty) Ltd", "ZAR", 70, 80, 70, 80, 0, "stale", "t0"],
+  ["loc", "GCPL México SA de CV", "MXN", 60, 120, 60, 120, 0, "stale", "t0"],
+  ["loc", "GCPL Bangladesh Ltd", "BDT", 45, 0, 45, 0, 0, "stale", "t1"]
+];
+const ramp3 = g => (g === "inr" ? 1 : 0.9);
+const y3 = (a, b, r) => a + r * (b - a);
+function rows(mode) {
+  return ENT.map(e => {
+    const t = mode === "today", r = ramp3(e[0]);
+    return { g: e[0], name: e[1], ccy: e[2], cash: t ? e[3] : y3(e[3], e[5], r), debt: t ? e[4] : y3(e[4], e[6], r),
+      vis: t ? e[7] : (e[9] === "t1" ? 0 : y3(e[3], e[5], r)), feed: t ? e[8] : e[9] };
+  }).filter(r => !(mode === "today" && r.feed === "none"));
+}
+function totals(mode) {
+  const r = rows(mode); let c = 0, d = 0, v = 0;
+  r.forEach(x => { c += x.cash; d += x.debt; v += x.vis; });
+  return { cash: c, debt: d, vis: v, overlap: mode === "today" ? BASE.liq : Y3.overlap };
+}
+const POOL = {
+  today: { inr: ["India · 5 treasuries", "No pool: subsidiaries hold idle cash while the parent issues CP"],
+           grc: ["Open markets · 12 treasuries", "No in-house bank: surplus and local borrowing side by side"],
+           loc: ["Restricted or tax-constrained · 4", "Managed locally"] },
+  target: { inr: ["INR pool · header at Domestic Bank A, Mumbai", "Daily zero-balance sweeps, documented as inter-corporate deposits"],
+            grc: ["GIFT City pool · in-house bank (GRCTC)", "USD, EUR and GBP headers at HSBC's IFSC unit; target-balance sweeps"],
+            loc: ["Local cash management · 4 markets", "Exchange controls or withholding tax; surplus comes up by dividend or loan"] }
+};
+const FEED = { t0: ["good", "T+0 · camt.053"], swept: ["good", "Swept daily"], partial: ["warn", "Partial · 5 of 9 banks"], stale: ["bad", "T−2 to T−6 · spreadsheet"], t1: ["warn", "T+1 · local bank"], none: ["neutral", "—"] };
+
+/* ---------- forecast ---------- */
+const FC = [62, 48, 71, 55, 90, 38, 66, 52, 79, 47, 85, 58, 70];
+const ACT = { today: [51, 58, 56, 66, 72, 47], target: [57, 52, 66, 60, 83, 41] };
+function fcAcc(mode) { const a = ACT[mode]; let s = 0; a.forEach((v, i) => { s += Math.abs(FC[i] - v) / v; }); return Math.round(100 * (1 - s / a.length)); }
+
+/* ---------- header ---------- */
+function header() {
+  const t = state.mode === "today";
+  $("#switch").dataset.mode = state.mode;
+  $("#m-today").setAttribute("aria-pressed", t);
+  $("#m-target").setAttribute("aria-pressed", !t);
+  $("#switch").classList.toggle("dim", state.tab === "simulator");
+  $("#asof").textContent = t ? "Mon 12 Oct 2026, 08:15 IST" : "Mon 10 Dec 2029, 08:15 IST";
+  $("#feed").textContent = t ? "Statements from 14 of 25 banks · portals and spreadsheets" : "camt.053 from 8 of 8 banks by 07:42 IST";
+  $("#live").classList.toggle("bad", t);
+  TABS.forEach(k => $("#t-" + k).setAttribute("aria-selected", state.tab === k));
+}
+
+/* =====================================================================
+   STAGE: 21 treasuries resolve into One Treasury (canvas)
+   ===================================================================== */
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function makeStage(host) {
+  const cv = host.querySelector("canvas"), ctx = cv.getContext("2d"), tip = host.querySelector(".tip"), netEl = host.querySelector(".net");
+  const cs = getComputedStyle(document.documentElement), tok = (k, d) => (cs.getPropertyValue(k).trim() || d);
+  const COL = { y: tok("--y", "#FFE600"), blue: tok("--stage-blue", "#4BA8F2"), good: tok("--stage-good", "#5BD88C"), bad: tok("--stage-bad", "#FF6B5F"),
+    grey: tok("--stage-grey", "#9A9AA6"), ink: tok("--stage-ink", "#FFFFFF"), muted: tok("--stage-muted", "#C2C2CC"), hole: tok("--stage", "#2E2E38") };
+  const FONT = (w, s) => w + " " + s + "px Lato, Calibri, Carlito, 'Segoe UI', sans-serif";
+  const rnd = mulberry(20261020);
+  const ents = ENT.filter(e => e[1].indexOf("GRCTC") < 0).map(e => ({
+    g: e[0], name: e[1], ccy: e[2], cT: e[3], dT: e[4], cF: y3(e[3], e[5], ramp3(e[0])), dF: y3(e[4], e[6], ramp3(e[0])), ph: rnd() * 6.28
+  }));
+  /* all positions are relative to the network region (the .net cell), 0..1 on each axis */
+  const CL = { inr: [0.15, 0.56, 0.1, 0.17], grc: [0.53, 0.55, 0.2, 0.21], loc: [0.9, 0.56, 0.06, 0.17] };
+  ents.forEach(n => { const c = CL[n.g], a = rnd() * 6.283, r = Math.sqrt(rnd()); n.tx = c[0] + Math.cos(a) * c[2] * r; n.ty = c[1] + Math.sin(a) * c[3] * r; });
+  for (let it = 0; it < 160; it++) {
+    for (let i = 0; i < ents.length; i++) for (let j = i + 1; j < ents.length; j++) {
+      const A = ents[i], B = ents[j]; const dx = (B.tx - A.tx) * 1.15, dy = B.ty - A.ty, d = Math.hypot(dx, dy) || 0.001, min = 0.088;
+      if (d < min) { const p = (min - d) / 2 / d; A.tx -= dx * p / 1.15; A.ty -= dy * p; B.tx += dx * p / 1.15; B.ty += dy * p; }
+    }
+    ents.forEach(n => { const c = CL[n.g]; n.tx = Math.min(c[0] + c[2] * 1.15, Math.max(c[0] - c[2] * 1.15, n.tx)); n.ty = Math.min(c[1] + c[3] * 1.2, Math.max(c[1] - c[3] * 1.2, n.ty)); });
+  }
+  const HUB = { inr: [0.15, 0.55, 0.1, 0.2], grc: [0.56, 0.55, 0.21, 0.27] };
+  const inr = ents.filter(n => n.g === "inr"), grc = ents.filter(n => n.g === "grc"), loc = ents.filter(n => n.g === "loc");
+  inr.forEach((n, i) => { const a = -Math.PI / 2 + i * (2 * Math.PI / inr.length); n.fx = HUB.inr[0] + Math.cos(a) * HUB.inr[2]; n.fy = HUB.inr[1] + Math.sin(a) * HUB.inr[3]; });
+  grc.forEach((n, i) => { const a = -Math.PI / 2 + (i + 0.5) * (2 * Math.PI / grc.length); n.fx = HUB.grc[0] + Math.cos(a) * HUB.grc[2]; n.fy = HUB.grc[1] + Math.sin(a) * HUB.grc[3]; });
+  loc.forEach((n, i) => { n.fx = 0.905 + (i % 2 ? 0.03 : -0.01); n.fy = 0.4 + i * 0.12; });
+  /* banks: 25+ today; the 8-bank panel is ordered so each pool sits under its own banks */
+  const RIB = 0.09;
+  const BT = Array.from({ length: 25 }, (_, i) => ({ x: 0.04 + i * (0.92 / 24) }));
+  const BF = [["Domestic Bank A", "INR pool header", "y"], ["Domestic Bank B", "collections and tax", "y"], ["HSBC", "lead bank, GIFT City pool header", "b"], ["Citi", "co-lead and backup header", "b"],
+    ["Bank of Nova Scotia", "Ireland", "b"], ["Standard Bank", "South Africa", "g"], ["Local bank", "Brazil", "g"], ["Local bank", "Bangladesh", "g"]].map((b, i) => ({ nm: b[0], role: b[1], c: b[2], x: 0.04 + i * (0.92 / 7) }));
+  const hubBank = [["inr", 0], ["inr", 1], ["grc", 2], ["grc", 3], ["grc", 4]];
+  const locBank = { "GCPL Brasil Ltda": 6, "GCPL South Africa (Pty) Ltd": 5, "GCPL México SA de CV": 3, "GCPL Bangladesh Ltd": 7 };
+  const spag = []; ents.forEach(n => { const k = 2 + Math.floor(rnd() * 2); for (let j = 0; j < k; j++) spag.push([n, BT[Math.floor(rnd() * BT.length)]]); });
+  const parts = [];
+  ents.forEach(n => {
+    if (n.g === "loc") return;
+    const out = n.g === "grc" && n.dT > 0 && n.dF < n.dT * 0.5;
+    const amt = n.g === "inr" ? n.cT - n.cF : (out ? n.dT - n.dF : n.cT - n.cF);
+    if (amt <= 0 || (n.g === "inr" && n.cF > 0)) return;
+    const k = Math.max(1, Math.min(4, Math.round(amt / 60)));
+    for (let j = 0; j < k; j++) parts.push({ n, out, t: rnd(), v: 0.0026 + rnd() * 0.002 });
+  });
+
+  let W = 0, H = 0, dpr = 1, raf = 0, alive = true, vis = true, hover = null, R = { x: 0, y: 0, w: 1, h: 1 }, sc = 1;
+  let m = state.mode === "target" ? 1 : 0, mFrom = m, mTo = m, mT0 = 0;
+  const DUR = 1500;
+  const ease = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const hex = c => { const h = c.replace("#", ""); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; };
+  const mix = (a, b, k) => { const A = hex(a), B = hex(b); return "rgb(" + Math.round(lerp(A[0], B[0], k)) + "," + Math.round(lerp(A[1], B[1], k)) + "," + Math.round(lerp(A[2], B[2], k)) + ")"; };
+  const rgba = (c, al) => { const A = hex(c); return "rgba(" + A[0] + "," + A[1] + "," + A[2] + "," + al + ")"; };
+  const P = (x, y) => [R.x + x * R.w, R.y + y * R.h];
+  function size() {
+    const r = host.getBoundingClientRect(), n = netEl.getBoundingClientRect();
+    W = Math.max(280, r.width); H = Math.max(300, r.height); dpr = Math.min(2, window.devicePixelRatio || 1);
+    R = { x: n.left - r.left + 6, y: n.top - r.top, w: Math.max(200, n.width - 18), h: Math.max(220, n.height - 6) };
+    sc = Math.max(0.72, Math.min(1, R.w / 480));
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const radius = (n, k) => Math.max(3.6, Math.min(15, 2.4 + Math.sqrt(lerp(n.cT, n.cF, k)) * 0.34)) * sc;
+  function pos(n, k, now) {
+    const w = reduce ? 0 : 2.2 * (1 - k), jx = Math.sin(now / 900 + n.ph) * w, jy = Math.cos(now / 1100 + n.ph) * w;
+    const a = P(n.tx, n.ty), b = P(n.fx, n.fy); return [lerp(a[0], b[0], k) + jx, lerp(a[1], b[1], k) + jy];
+  }
+  const hubXY = g => P(HUB[g][0], HUB[g][1]);
+  const curve = (x1, y1, x2, y2, bend) => { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1; return [mx - dy * bend, my + dx * bend]; };
+  const qpt = (x1, y1, cx, cy, x2, y2, t) => { const u = 1 - t; return [u * u * x1 + 2 * u * t * cx + t * t * x2, u * u * y1 + 2 * u * t * cy + t * t * y2]; };
+  function label(txt, x, y, al, color, align) {
+    ctx.font = FONT(900, 10.5); ctx.textAlign = align || "center"; ctx.fillStyle = rgba(color || COL.muted, al);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "1px";
+    const w = ctx.measureText(txt).width;
+    if (ctx.textAlign === "center") x = Math.max(10 + w / 2, Math.min(W - 10 - w / 2, x));
+    ctx.fillText(txt, x, y);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  }
+  function draw(now) {
+    if (mFrom !== mTo) { const k = Math.min(1, Math.max(0, (now - mT0) / (reduce ? 1 : DUR))); m = lerp(mFrom, mTo, ease(k)); if (k >= 1) { m = mTo; mFrom = mTo; } }
+    ctx.clearRect(0, 0, W, H);
+    const k = m, inv = 1 - m, pts = new Map();
+    ents.forEach(n => pts.set(n, pos(n, k, now)));
+    const rb = P(0, RIB)[1];
+    /* today: every entity wired to its own banks */
+    if (inv > 0.01) {
+      ctx.lineWidth = 1; ctx.strokeStyle = rgba(COL.ink, 0.1 * inv); ctx.beginPath();
+      spag.forEach(([n, b]) => { const p = pts.get(n), q = P(b.x, RIB); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); });
+      ctx.stroke();
+    }
+    /* Year 3: headers to their banks, members to their header */
+    if (k > 0.01) {
+      ctx.lineWidth = 1.3;
+      hubBank.forEach(([g, i]) => { const h = hubXY(g), q = P(BF[i].x, RIB); ctx.strokeStyle = rgba(g === "inr" ? COL.y : COL.blue, 0.38 * k); ctx.beginPath(); ctx.moveTo(h[0], h[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); });
+      loc.forEach(n => { const p = pts.get(n), q = P(BF[locBank[n.name]].x, RIB); ctx.strokeStyle = rgba(COL.grey, 0.32 * k); ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); });
+      [inr, grc].forEach(list => list.forEach(n => {
+        const p = pts.get(n), h = hubXY(n.g), c = curve(p[0], p[1], h[0], h[1], 0.12);
+        ctx.strokeStyle = rgba(n.g === "inr" ? COL.y : COL.blue, 0.28 * k); ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.quadraticCurveTo(c[0], c[1], h[0], h[1]); ctx.stroke();
+      }));
+    }
+    /* bank ribbon */
+    const bs = 6 * sc;
+    if (inv > 0.01) BT.forEach(b => { const q = P(b.x, RIB); ctx.fillStyle = rgba(COL.muted, 0.75 * inv); ctx.fillRect(q[0] - bs / 2, q[1] - bs / 2, bs, bs); });
+    if (k > 0.01) BF.forEach((b, i) => {
+      const q = P(b.x, RIB), s = bs + 5, col = b.c === "y" ? COL.y : (b.c === "b" ? COL.blue : COL.grey);
+      ctx.fillStyle = rgba(col, k); ctx.fillRect(q[0] - s / 2, q[1] - s / 2, s, s);
+      if (hover === b) { ctx.strokeStyle = rgba(COL.ink, 1); ctx.lineWidth = 2; ctx.strokeRect(q[0] - s / 2 - 3, q[1] - s / 2 - 3, s + 6, s + 6); }
+    });
+    label(inv > 0.5 ? "25+ BANKS · 75+ ACCOUNTS" : "8-BANK PANEL · ~38 ACCOUNTS", P(0.04, 0)[0] - 4, rb - 14, 1, COL.muted, "left");
+    /* Year 3: cash moving along the links */
+    if (k > 0.3) {
+      const al = Math.min(1, (k - 0.3) / 0.5);
+      parts.forEach(pt => {
+        if (!reduce) { pt.t += pt.v; if (pt.t > 1) pt.t -= 1; }
+        const n = pt.n, p = pts.get(n), h = hubXY(n.g), c = curve(p[0], p[1], h[0], h[1], 0.12), t = pt.out ? 1 - pt.t : pt.t;
+        const q = qpt(p[0], p[1], c[0], c[1], h[0], h[1], t), col = n.g === "inr" ? COL.y : (pt.out ? COL.good : COL.blue);
+        ctx.fillStyle = rgba(col, 0.95 * al); ctx.shadowColor = rgba(col, 0.9); ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(q[0], q[1], 2.4 * sc + 0.3, 0, 6.283); ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+    }
+    /* entities */
+    ents.forEach(n => {
+      const p = pts.get(n), r = radius(n, k), idle = n.dT === 0, borrow = n.dT > 0;
+      const tgt = n.g === "inr" ? COL.y : (n.g === "grc" ? COL.blue : COL.grey);
+      if (idle && inv > 0.02) {
+        const pulse = reduce ? 0.5 : (Math.sin(now / 520 + n.ph) + 1) / 2;
+        ctx.fillStyle = rgba(COL.bad, (0.14 + 0.16 * pulse) * inv);
+        ctx.beginPath(); ctx.arc(p[0], p[1], r + 5 + pulse * 4, 0, 6.283); ctx.fill();
+      }
+      ctx.fillStyle = mix(idle ? COL.bad : COL.grey, tgt, k);
+      ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 6.283); ctx.fill();
+      if (borrow && inv > 0.02) { ctx.strokeStyle = rgba(COL.ink, 0.95 * inv); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], r + 2.5, 0, 6.283); ctx.stroke(); }
+      if (hover === n) { ctx.strokeStyle = rgba(COL.ink, 1); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], r + 5, 0, 6.283); ctx.stroke(); }
+    });
+    /* pool headers and labels */
+    if (k > 0.02) {
+      [["inr", COL.y, "INR POOL · MUMBAI"], ["grc", COL.blue, "IN-HOUSE BANK · GIFT CITY"]].forEach(([g, col, lab]) => {
+        const h = hubXY(g), s = (0.6 + 0.4 * k) * sc;
+        ctx.fillStyle = rgba(col, 0.18 * k); ctx.beginPath(); ctx.arc(h[0], h[1], 26 * s, 0, 6.283); ctx.fill();
+        ctx.fillStyle = rgba(col, k); ctx.beginPath(); ctx.arc(h[0], h[1], 13 * s, 0, 6.283); ctx.fill();
+        ctx.fillStyle = rgba(COL.hole, k); ctx.beginPath(); ctx.arc(h[0], h[1], 4.5 * s, 0, 6.283); ctx.fill();
+        const ly = P(0, HUB[g][1] + HUB[g][3])[1] + 30;
+        label(lab, h[0], ly, k, COL.ink);
+      });
+      const lq = P(0.91, 0.29); label("LOCAL · 4", lq[0], lq[1], k);
+    }
+    if (inv > 0.02) [["inr", "INDIA · 5"], ["grc", "OVERSEAS · 12"], ["loc", "RESTRICTED · 4"]].forEach(([g, t]) => {
+      const c = CL[g], q = P(c[0], c[1] + c[3] * 1.2); label(t, q[0], q[1] + 30, inv);
+    });
+    ctx.textAlign = "left";
+  }
+  function frame(now) {
+    if (!alive) return;
+    draw(now);
+    if ((!reduce && vis && !document.hidden) || mFrom !== mTo) raf = requestAnimationFrame(frame); else raf = 0;
+  }
+  const kick = () => { if (!raf && alive) raf = requestAnimationFrame(frame); };
+  const ro = new ResizeObserver(() => { size(); draw(performance.now()); kick(); });
+  ro.observe(host);
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(es => { vis = es[0].isIntersecting; kick(); }) : null;
+  if (io) io.observe(host);
+  const onVis = () => kick(); document.addEventListener("visibilitychange", onVis);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (alive) draw(performance.now()); });
+  function nearest(x, y) {
+    let best = null, bd = 16;
+    const now = performance.now();
+    ents.forEach(n => { const p = pos(n, m, now), d = Math.hypot(p[0] - x, p[1] - y) - radius(n, m); if (d < bd) { bd = d; best = n; } });
+    if (!best && m > 0.5) BF.forEach(b => { const q = P(b.x, RIB), d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = b; } });
+    return best;
+  }
+  host.addEventListener("pointermove", ev => {
+    const r = host.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top, n = nearest(x, y);
+    hover = n; cv.style.cursor = n ? "pointer" : "default";
+    if (!n) { tip.classList.remove("on"); kick(); return; }
+    let px, py;
+    if (n.nm) {
+      tip.innerHTML = "<b>" + esc(n.nm) + "</b><span>" + esc(n.role) + "</span>";
+      const q = P(n.x, RIB); px = q[0]; py = q[1] + 64;
+      tip.style.transform = "translate(-50%,0)";
+    } else {
+      const today = m < 0.5, cash = today ? n.cT : n.cF, debt = today ? n.dT : n.dF;
+      let line;
+      if (today) line = n.dT > 0 ? "Borrows locally while sister entities hold cash" : "Cash idle in local accounts";
+      else line = n.g === "inr" ? (n.cF > 0 ? "Owns the INR header account" : "Swept to the INR header every evening") : (n.g === "grc" ? (n.dT > 0 ? "Funded by the in-house bank, not local banks" : "Surplus swept to the GIFT City header") : "Local cash management; surplus sent up by dividend");
+      tip.innerHTML = "<b>" + esc(n.name) + "</b><span>" + esc(n.ccy) + " · cash " + rs(cash) + " Cr · debt " + rs(debt) + " Cr</span><br><span>" + esc(line) + "</span>";
+      const p = pos(n, m, performance.now()); px = p[0]; py = p[1];
+      tip.style.transform = "";
+    }
+    tip.style.left = Math.max(125, Math.min(W - 125, px)) + "px"; tip.style.top = py + "px"; tip.classList.add("on");
+    kick();
+  });
+  host.addEventListener("pointerleave", () => { hover = null; tip.classList.remove("on"); kick(); });
+  size(); kick();
+  return {
+    to(mode) { const tgt = mode === "target" ? 1 : 0; if (tgt === mTo) return; mFrom = m; mTo = tgt; mT0 = performance.now(); kick(); },
+    destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); if (io) io.disconnect(); document.removeEventListener("visibilitychange", onVis); }
+  };
+}
+
+/* =====================================================================
+   COCKPIT
+   ===================================================================== */
+let stage = null;
+function kpiData(mode) {
+  const t = mode === "today", T = totals(mode), acc = fcAcc(mode);
+  return [
+    { k: "vis", l: "Cash visible same day", v: t ? 40 : Math.round(100 * T.vis / T.cash), f: v => Math.round(v) + "%",
+      d: t ? "₹" + fmt(T.vis) + " of ₹" + fmt(T.cash) + " Cr, from 14 of 25 banks" : "₹" + fmt(T.vis) + " of ₹" + fmt(T.cash) + " Cr by 08:15 IST",
+      fill: t ? 0.4 : T.vis / T.cash, goal: 0.98, s: t ? ["bad", "Target ≥98%"] : ["good", "On target"] },
+    { k: "idle", l: "Idle cash while borrowing", v: t ? BASE.liq : Y3.overlap, f: v => "₹" + fmt(v) + " Cr",
+      d: t ? "Could repay external debt today" : "Down from ₹" + fmt(BASE.liq) + " Cr", fill: (t ? BASE.liq : Y3.overlap) / BASE.liq, goal: 90 / BASE.liq, s: t ? ["bad", "Target <₹90 Cr"] : ["good", "On target"] },
+    { k: "fc", l: "13-week forecast accuracy", v: acc, f: v => Math.round(v) + "%", d: t ? "Rolled up from 21 spreadsheets" : "Rolling, from the TMS with AI support",
+      fill: acc / 100, goal: 0.9, s: t ? ["bad", "Target ≥90%"] : ["good", "On target"] },
+    { k: "banks", l: "Banks · accounts", v: t ? 25 : 8, f: v => { const a = 38 + (v - 8) * (37 / 17); return Math.round(v) + (v > 24.5 ? "+" : "") + " · " + Math.round(a) + (a > 74.5 ? "+" : ""); },
+      d: t ? "Duplicate accounts across geographies" : "4 global · 2 Indian · 2 local", fill: (t ? 25 : 8) / 25, goal: 8 / 25, s: t ? ["bad", "Target 8 · ~38"] : ["good", "Panel complete"] },
+    { k: "stp", l: "Payments straight-through", v: t ? 60 : 96, f: v => (t ? "~" : "") + Math.round(v) + "%", d: t ? "25 portals; sanctions screening partial" : "One channel; 100% sanctions-screened",
+      fill: (t ? 60 : 96) / 100, goal: 0.95, s: t ? ["bad", "Target ≥95%"] : ["good", "On target"] },
+    { k: "nis", l: "Net interest saved this year", v: t ? 0 : Y3.nis, f: v => "₹" + (v < 0.05 ? "0" : fmt(v, 1)) + " Cr", d: t ? "Pools and sweeps not yet live" : "Year 3, as phased in Annex E2",
+      fill: t ? 0 : 1, goal: 1, s: t ? ["neutral", "Year 3 plan: ₹" + fmt(Y3.nis, 1) + " Cr"] : ["good", "On plan"] }
+  ];
+}
+function mountCockpit() {
+  view.innerHTML =
+    '<div class="grid">' +
+    '<section class="stage" id="stage" aria-labelledby="st-h"><canvas aria-hidden="true"></canvas><div class="tip" role="presentation"></div>' +
+    '<div class="top"><div class="eye">Liquidity map · hover an entity</div><h2 id="st-h"></h2></div>' +
+    '<div class="net" aria-hidden="true"></div>' +
+    '<div class="bot"><div class="hero"><span class="lab">Idle cash while the group borrows</span><span class="num" id="st-n"></span><span class="cap" id="st-c"></span></div><div class="legend" id="st-l"></div></div>' +
+    '<p class="sr" id="st-sr"></p></section>' +
+    '<section class="kpis" aria-label="Key indicators">' + kpiData(state.mode).map(q =>
+      '<div class="panel kpi" id="k-' + q.k + '"><div class="l">' + esc(q.l) + '</div><div class="v"></div><div class="meter"><div class="fill"></div><div class="goal" title="Target"></div></div><div class="d"></div><div class="c"></div></div>').join("") + "</section>" +
+    '<section class="panel p-ent" aria-label="Cash and debt by entity"><div class="ph"><h3>Cash &amp; external debt by entity</h3><span class="sub" id="ent-s"></span></div>' +
+    '<div class="sum"><span>Group cash<b id="s-cash"></b></span><span>External debt<b id="s-debt"></b></span><span class="hl" id="s-ov-w">Idle while borrowing<b id="s-ov"></b></span></div>' +
+    '<div class="tbox" tabindex="0" aria-label="Entity table"><table><thead><tr><th>Entity</th><th>Ccy</th><th class="n">Cash</th><th class="n">Ext. debt</th><th>Balance feed</th></tr></thead><tbody id="ent-b"></tbody></table></div></section>' +
+    '<section class="panel p-fc" aria-label="13-week cash forecast"><div class="ph"><h3>13-week net cash flow</h3><span class="sub" id="fc-s"></span></div><div class="chart" id="fc"></div>' +
+    '<div class="keys"><span><i></i>Actual</span><span><i class="fc"></i>Forecast</span><span><i class="band"></i><span id="fc-band"></span></span></div>' +
+    '<details class="tv"><summary>Table view</summary><div id="fc-t"></div></details></section>' +
+    '<section class="panel p-bk" aria-label="Bank counterparty exposure"><div class="ph"><h3>Counterparty exposure vs limit</h3><span class="sub" id="bk-s"></span></div><div id="bk"></div></section>' +
+    '<section class="panel p-pay" aria-label="Payment factory"><div class="ph"><h3>Payment factory · today</h3><span class="sub" id="pay-s"></span></div><div class="stats" id="pay"></div><p class="note" id="pay-n"></p></section>' +
+    '<section class="panel p-al" aria-label="Alerts"><div class="ph"><h3>Alerts &amp; actions</h3><span class="sub" id="al-s"></span></div><ul class="alerts" id="al"></ul></section>' +
+    "</div>";
+  stage = makeStage($("#stage"));
+  watchWidth($("#fc"), () => forecast(state.mode, false));
+  const tb = $(".tbox");
+  tb.addEventListener("scroll", () => tb.classList.toggle("end", tb.scrollTop + tb.clientHeight >= tb.scrollHeight - 4), { passive: true });
+}
+function updateCockpit(first) {
+  const mode = state.mode, t = mode === "today", T = totals(mode);
+  if (stage) stage.to(mode);
+  // stage copy
+  $("#st-h").textContent = t ? "21 treasuries, 25+ banks and no group view of cash" : "One Treasury: two pools, eight banks, one view of cash";
+  const n = $("#st-n"); n.className = "num " + (t ? "bad" : "good");
+  glide(n, "st", t ? BASE.liq : Y3.overlap, v => "₹" + fmt(v) + " Cr", 1400, first ? 0 : undefined);
+  $("#st-c").textContent = t ? "12 entities sit on idle cash while 9, including the parent, borrow ₹4,400 Cr from banks." : "Down from ₹" + fmt(BASE.liq) + " Cr: surplus now funds sister companies through the in-house bank.";
+  $("#st-l").innerHTML = t
+    ? '<span><i style="background:var(--stage-bad)"></i>Idle cash</span><span><i class="ring"></i>Borrows locally</span><span><i class="sq" style="background:var(--stage-muted)"></i>Bank</span>'
+    : '<span><i style="background:var(--y)"></i>INR pool</span><span><i style="background:var(--stage-blue)"></i>GIFT City pool</span><span><i style="background:var(--stage-good)"></i>In-house funding</span><span><i style="background:var(--stage-grey)"></i>Local</span>';
+  $("#st-sr").textContent = t ? "Map of 21 entities: 12 hold idle cash with no debt while 9, including the parent, borrow; each entity uses its own banks (25 or more)." : "Map of the Year-3 structure: 5 Indian entities sweep to the INR pool; 12 overseas entities sweep to the GIFT City in-house bank, which funds the former borrowers; 4 restricted markets stay local; 8 banks.";
+  // KPIs
+  kpiData(mode).forEach(q => {
+    const el = $("#k-" + q.k);
+    glide($(".v", el), "k" + q.k, q.v, q.f, 1100, first ? 0 : undefined);
+    $(".d", el).textContent = q.d;
+    $(".c", el).innerHTML = chip(q.s[0], q.s[1]);
+    const fill = $(".fill", el), good = q.s[0] === "good";
+    fill.style.background = good ? "var(--good-fill)" : (q.s[0] === "neutral" ? "var(--faint)" : "var(--bad-fill)");
+    $(".goal", el).style.left = (100 * Math.min(1, q.goal)) + "%";
+    later(() => { fill.style.width = (100 * Math.min(1, Math.max(0.015, q.fill))) + "%"; });
+  });
+  // summary + table
+  $("#ent-s").textContent = (t ? "21 entities, each with its own treasury" : "Pools concentrate cash; external debt sits centrally") + " · scroll for all";
+  glide($("#s-cash"), "sc", T.cash, v => "₹" + fmt(v) + " Cr", 1100, first ? 0 : undefined);
+  glide($("#s-debt"), "sd", T.debt, v => "₹" + fmt(v) + " Cr", 1100, first ? 0 : undefined);
+  glide($("#s-ov"), "so", T.overlap, v => "₹" + fmt(v) + " Cr", 1100, first ? 0 : undefined);
+  $("#s-ov-w").className = "hl" + (t ? "" : " good");
+  const prev = updateCockpit.lastRows || {};
+  const r = rows(mode); let html = "";
+  ["inr", "grc", "loc"].forEach(g => {
+    const gp = POOL[mode][g], dot = g === "inr" ? "var(--y);box-shadow:0 0 0 1.5px var(--fg)" : (g === "grc" ? "var(--fg)" : "var(--faint)");
+    html += '<tr class="grp"><td colspan="5"><span class="dotc" style="background:' + dot + '"></span>' + esc(gp[0]) + "<small>" + esc(gp[1]) + "</small></td></tr>";
+    r.filter(x => x.g === g).forEach(x => {
+      const f = FEED[x.feed] || FEED.none, p = prev[x.name];
+      const cf = p && Math.round(p.cash) !== Math.round(x.cash) ? " flash" : "", df = p && Math.round(p.debt) !== Math.round(x.debt) ? " flash" : "";
+      html += "<tr><td>" + esc(x.name) + '</td><td class="ccy">' + x.ccy + '</td><td class="n' + (Math.round(x.cash) === 0 ? " z" : "") + cf + '">' + fmt(x.cash) + '</td><td class="n' + (Math.round(x.debt) === 0 ? " z" : "") + df + '">' + fmt(x.debt) + "</td><td>" + chip(f[0], f[1]) + "</td></tr>";
+    });
+  });
+  $("#ent-b").innerHTML = html;
+  updateCockpit.lastRows = Object.fromEntries(r.map(x => [x.name, x]));
+  forecast(mode);
+  banks(mode);
+  pay(mode, first);
+  alerts(mode);
+}
+
+/* forecast chart: actual vs forecast, tolerance band, crosshair tooltip */
+const watchers = [];
+function watchWidth(el, cb) {
+  if (!("ResizeObserver" in window)) return;
+  let last = el.clientWidth;
+  const ro = new ResizeObserver(() => { const w = el.clientWidth; if (Math.abs(w - last) > 3) { last = w; cb(); } });
+  ro.observe(el); watchers.push(ro);
+}
+function forecast(mode, animate) {
+  const box0 = $("#fc"), W = Math.max(300, Math.round(box0.clientWidth || 520)), H = Math.round(Math.max(200, Math.min(250, W * 0.44))), pl = 34, pr = 14, pt = 14, pb = 30, n = FC.length, a = ACT[mode], acc = fcAcc(mode), band = mode === "today" ? 0.22 : 0.1;
+  const x = i => pl + i * (W - pl - pr) / (n - 1), y = v => pt + (H - pt - pb) * (1 - v / 120);
+  let s = "";
+  [0, 30, 60, 90, 120].forEach(tk => { s += '<line class="grid-l" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(tk) + '" y2="' + y(tk) + '"/><text x="' + (pl - 7) + '" y="' + (y(tk) + 4) + '" text-anchor="end">' + tk + "</text>"; });
+  const up = [], dn = [];
+  for (let i = 5; i < n; i++) { up.push(x(i) + "," + y(FC[i] * (1 + band))); dn.unshift(x(i) + "," + y(FC[i] * (1 - band))); }
+  s += '<g clip-path="url(#fc-clip)"><polygon points="' + up.concat(dn).join(" ") + '" fill="var(--blue-wash)" stroke="none"/>';
+  s += '<polyline points="' + FC.map((v, i) => x(i) + "," + y(v)).join(" ") + '" fill="none" stroke="var(--blue)" stroke-width="2" stroke-dasharray="6 5" stroke-linecap="round" stroke-linejoin="round"/>';
+  s += '<polyline points="' + a.map((v, i) => x(i) + "," + y(v)).join(" ") + '" fill="none" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  s += '<circle cx="' + x(a.length - 1) + '" cy="' + y(a[a.length - 1]) + '" r="5" fill="var(--fg)" stroke="var(--panel)" stroke-width="2.5"/></g>';
+  s += '<line x1="' + x(5.5) + '" x2="' + x(5.5) + '" y1="' + pt + '" y2="' + (H - pb) + '" stroke="var(--faint)" stroke-width="1"/><text x="' + (x(5.5) + 6) + '" y="' + (pt + 11) + '" fill="var(--fg)">Today</text>';
+  for (let k = 0; k < n; k += 2) s += '<text x="' + x(k) + '" y="' + (H - 9) + '" text-anchor="middle">W' + (k + 1) + "</text>";
+  s += '<line id="fc-x" x1="0" x2="0" y1="' + pt + '" y2="' + (H - pb) + '" stroke="var(--fg)" stroke-width="1" opacity="0"/>';
+  s += '<rect id="fc-hit" x="' + pl + '" y="' + pt + '" width="' + (W - pl - pr) + '" height="' + (H - pt - pb) + '" fill="transparent"/>';
+  const box = $("#fc");
+  box.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Line chart: actual versus forecast weekly net cash flow, ₹ crore, 13 weeks"><defs><clipPath id="fc-clip"><rect id="fc-cr" x="0" y="0" width="' + (reduce ? W : 0) + '" height="' + H + '"/></clipPath></defs>' + s + '</svg><div class="ctip" id="fc-tip"></div>';
+  $("#fc-s").innerHTML = "₹ Cr per week · accuracy <b>" + acc + "%</b> over the last 6 weeks";
+  $("#fc-band").textContent = "±" + Math.round(band * 100) + "% " + (mode === "today" ? "error band" : "tolerance");
+  $("#fc-t").innerHTML = '<table><thead><tr><th>Week</th><th class="n">Forecast</th><th class="n">Actual</th></tr></thead><tbody>' + FC.map((v, i) => "<tr><td>W" + (i + 1) + '</td><td class="n">' + v + '</td><td class="n">' + (a[i] !== undefined ? a[i] : "—") + "</td></tr>").join("") + "</tbody></table>";
+  if (!reduce && animate !== false) { const cr = $("#fc-cr"), t0 = performance.now(); const step = now => { const k = Math.min(1, Math.max(0, (now - t0) / 1100)), e = 1 - Math.pow(1 - k, 3); cr.setAttribute("width", W * e); if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); } else $("#fc-cr").setAttribute("width", W);
+  const svg = $("svg", box), tipEl = $("#fc-tip"), xl = $("#fc-x");
+  const show = i => {
+    xl.setAttribute("x1", x(i)); xl.setAttribute("x2", x(i)); xl.setAttribute("opacity", ".35");
+    tipEl.innerHTML = '<div style="color:var(--muted);font-weight:700;margin-bottom:4px">Week ' + (i + 1) + (i < 6 ? "" : " · forecast") + "</div>" +
+      (a[i] !== undefined ? '<div class="row"><b>' + a[i] + '</b><span><span class="k"></span> Actual</span></div>' : "") +
+      '<div class="row"><b>' + FC[i] + '</b><span><span class="k fc"></span> Forecast</span></div>';
+    const bb = svg.getBoundingClientRect(), sx = bb.width / W;
+    tipEl.style.left = Math.max(70, Math.min(bb.width - 70, x(i) * sx)) + "px"; tipEl.style.top = (y(Math.max(FC[i], a[i] || 0)) * sx - 10) + "px"; tipEl.classList.add("on");
+  };
+  const hit = $("#fc-hit");
+  hit.addEventListener("pointermove", ev => { const bb = svg.getBoundingClientRect(), px = (ev.clientX - bb.left) * W / bb.width; show(Math.max(0, Math.min(n - 1, Math.round((px - pl) / ((W - pl - pr) / (n - 1)))))); });
+  hit.addEventListener("pointerleave", () => { tipEl.classList.remove("on"); xl.setAttribute("opacity", "0"); });
+}
+
+/* counterparty exposure */
+const BANKS = {
+  target: [["HSBC", "Lead · GIFT City pool header", 360, 500], ["Domestic Bank A", "INR pool header · CP lines", 290, 600], ["Citi", "Co-lead · backup header", 190, 400], ["Domestic Bank B", "Collections · tax payments", 120, 400], ["Standard Bank", "South Africa", 40, 75], ["Local bank, Brazil", "Statutory payments", 23, 60], ["Bank of Nova Scotia", "Ireland", 20, 60], ["Local bank, Bangladesh", "Statutory payments", 18, 40]],
+  today: [["Domestic Bank A", "", 520, null], ["Domestic Bank B", "", 410, null], ["HSBC", "", 240, null], ["Citi", "", 180, null], ["Deutsche Bank", "", 150, null], ["BNP Paribas", "", 120, null], ["Standard Chartered", "", 105, null], ["J.P. Morgan", "", 90, null], ["ING", "", 75, null], ["UniCredit", "", 55, null]]
+};
+function banks(mode) {
+  const t = mode === "today", list = BANKS[mode], max = t ? 600 : 620;
+  $("#bk-s").textContent = t ? "Top 10 of 25+ banks · no limits set" : "8-bank panel · limits checked daily";
+  let html = "";
+  list.forEach(b => {
+    const u = b[3] ? b[2] / b[3] : null, cls = u === null ? null : (u > 0.85 ? "bad" : (u > 0.7 ? "warn" : "good"));
+    const col = cls ? "var(--" + cls + "-fill)" : "var(--faint)";
+    html += '<div class="bank"><div class="nm">' + esc(b[0]) + (b[1] ? "<small>" + esc(b[1]) + "</small>" : "") + '</div><div class="trk"><div class="fill" data-w="' + (100 * b[2] / max).toFixed(1) + '" style="background:' + col + '"></div>' + (b[3] ? '<div class="lim" style="left:' + (100 * b[3] / max).toFixed(1) + '%" title="Limit"></div>' : "") + "</div>" +
+      '<div class="val">₹' + fmt(b[2]) + (b[3] ? " / " + fmt(b[3]) + " · <b" + (cls === "good" ? "" : ' style="color:var(--' + cls + ')"') + ">" + Math.round(100 * u) + "%</b>" : ' · <b style="color:var(--bad)">no limit</b>') + "</div></div>";
+  });
+  if (t) html += '<div class="bank"><div class="nm">+15 more banks<small>11 have not reported today</small></div><div class="trk hatch"><div class="fill" data-w="100"></div></div><div class="val">₹905 · <b style="color:var(--bad)">unverified</b></div></div>';
+  const box = $("#bk"); box.innerHTML = html;
+  later(() => box.querySelectorAll(".fill").forEach(f => { f.style.width = f.dataset.w + "%"; }));
+}
+
+/* payments */
+function pay(mode, first) {
+  const t = mode === "today";
+  $("#pay-s").textContent = t ? "Each entity pays from its own banks" : "Treasury SSC, India · payments on behalf where legal";
+  const S = t ? [["Payments released", 1800, v => "~" + fmt(v)], ["Value released", null, () => "Unknown"], ["Straight-through", 60, v => "~" + Math.round(v) + "%"], ["Sanctions-screened", null, () => "Partial"]]
+              : [["Payments released", 1842, v => fmt(v)], ["Value released", 312, v => "₹" + fmt(v) + " Cr"], ["Straight-through", 96, v => Math.round(v) + "%"], ["Held for review", 3, v => Math.round(v) + " of 1,842"]];
+  const box = $("#pay");
+  if (!box.children.length) box.innerHTML = S.map((s, i) => '<div class="stat"><div class="l"></div><div class="v" id="pv' + i + '"></div></div>').join("");
+  S.forEach((s, i) => {
+    box.children[i].querySelector(".l").textContent = s[0];
+    const el = $("#pv" + i);
+    if (s[1] === null) { el.textContent = s[2](); el.style.color = "var(--bad)"; memo["pv" + i] = 0; }
+    else { el.style.color = ""; glide(el, "pv" + i, s[1], s[2], 1000, first ? 0 : undefined); }
+  });
+  $("#pay-n").innerHTML = t ? "<b>25 e-banking portals and 61 security tokens.</b> Screening depends on each bank; no group view of fraud attempts."
+    : "<b>One channel:</b> SWIFT via a service bureau for the 4 global banks, APIs for the 2 Indian banks, ISO 20022 (pain.001 out, camt.053 in). Every payment is sanctions- and fraud-screened before release.";
+}
+
+/* alerts */
+const ALERTS = {
+  today: [["bad", "No limits", "No counterparty limits: ₹2,850 Cr spread across 25+ banks", "08:15"], ["bad", "Idle cash", "USA Distribution borrows ₹400 Cr at 6.25% while USA Inc holds ₹150 Cr idle", "08:15"], ["bad", "Visibility", "11 of 25 banks have not reported today; balances are 2–6 days old", "08:10"], ["warn", "Payments", "Payments released from 25 portals; sanctions screening coverage is partial", "07:55"], ["warn", "Reporting", "Month-end treasury pack: day 7 of ~10", "Fri"]],
+  target: [["warn", "Limit 72%", "HSBC exposure at 72% of limit: move ₹40 Cr to liquid funds before 16:00 IST", "08:15"], ["bad", "Sanctions", "1 payment held by sanctions screening; Compliance review due within 2 hours", "08:02"], ["warn", "Trapped cash", "GCPL Brasil Ltda holds ₹110 Cr above need: schedule the Q4 dividend upstream", "07:48"], ["good", "Netting", "November netting closed: ₹100 Cr of intercompany invoices settled as ₹58 Cr", "Fri"], ["good", "Forecast", "Week 49 variance 6.8%, inside the ±10% tolerance", "Fri"]]
+};
+function alerts(mode) {
+  $("#al-s").textContent = mode === "today" ? "Raised manually, if at all" : "Rules in the TMS; the owner is notified automatically";
+  $("#al").innerHTML = ALERTS[mode].map((a, i) => '<li class="fade" style="animation-delay:' + (i * 70) + 'ms">' + chip(a[0], a[1]) + "<span>" + esc(a[2]) + "</span><time>" + esc(a[3]) + "</time></li>").join("");
+}
+
+/* =====================================================================
+   LIQUIDITY STRUCTURE
+   ===================================================================== */
+function mountLiquidity() { view.innerHTML = '<div class="grid" id="liq"></div>'; }
+function updateLiquidity() {
+  const mode = state.mode, t = mode === "today", r = rows(mode);
+  const mem = g => r.filter(x => x.g === g && x.name.indexOf("GRCTC") < 0);
+  const sum = (a, k) => a.reduce((s, x) => s + x[k], 0);
+  const flow = (cls, txt) => '<span class="flow ' + cls + '"><svg viewBox="0 0 34 10" aria-hidden="true"><line x1="1" y1="5" x2="33" y2="5"/></svg>' + esc(txt) + "</span>";
+  function col(title, why, hdr, list, side) {
+    return '<div class="panel pool fade"><h4>' + esc(title) + '</h4><div class="why">' + esc(why) + "</div>" +
+      '<div class="hdr ' + hdr[3] + '"><div><b>' + esc(hdr[0]) + "</b><small>" + esc(hdr[1]) + '</small></div><span class="amt">' + hdr[2] + "</span></div>" +
+      list.map(x => '<div class="mem"><span>' + esc(x.name) + "</span>" + side(x) + '<span class="n">' + fmt(x.cash) + "</span></div>").join("") + "</div>";
+  }
+  const I = mem("inr"), G = mem("grc"), L = mem("loc");
+  let h = '<div class="pools">';
+  if (t) {
+    h += col("India · no pool", "Four subsidiaries hold ₹300 Cr in current accounts while the parent issues CP at 6.50%.", ["No header account", "Each entity banks on its own", "₹0", "none"], I, x => (x.debt ? chip("bad", "borrows ₹" + fmt(x.debt)) : chip("bad", "idle")));
+    h += col("Open markets · no in-house bank", "12 entities hold ₹855 Cr and borrow ₹1,100 Cr locally at about 6.25%.", ["No header account", "Surplus and borrowing side by side", "₹0", "none"], G, x => (x.debt ? chip("bad", "borrows ₹" + fmt(x.debt)) : chip("bad", "idle")));
+    h += col("Restricted or tax-constrained", "Exchange controls (Bangladesh, Brazil, South Africa) or withholding tax on cross-border interest (Mexico).", ["Local banks only", "No group visibility", "₹" + fmt(sum(L, "cash")), "none"], L, x => (x.debt ? chip("warn", "borrows ₹" + fmt(x.debt)) : chip("neutral", "local")));
+  } else {
+    h += col("INR pool (onshore)", "Physical only, as notional pooling is not recognized in India. Sweeps are inter-corporate deposits within Companies Act s.185/186, at arm's length.", ["Header · Domestic Bank A", "Mumbai · zero-balance sweep at 18:00 IST", "₹" + fmt(sum(I, "cash")) + " Cr", ""], I, x => (x.name.indexOf("parent") > -1 ? chip("good", "header owner") : flow("in", "swept")));
+    h += col("GIFT City pool (in-house bank)", "The GRCTC is a non-resident under FEMA, so dealing with overseas subsidiaries needs no FEMA approval. INR never sweeps offshore.", ["Headers · HSBC IFSC unit", "Citi IFSC unit as backup · USD, EUR, GBP", "₹" + fmt(sum(G, "cash")) + " Cr", "blue"], G, x => (ENT.find(e => e[1] === x.name)[4] > 0 ? flow("gold", "funded") : flow("blue", "target balance")));
+    h += col("Local cash management", "In-country cash management; surplus comes up by dividend or intercompany loan when windows open.", ["Lead bank in country", "HSBC or Citi; a local bank only where law requires", "₹" + fmt(sum(L, "cash")) + " Cr", ""], L, x => chip("neutral", { BRL: "IOF, BCB registration", ZAR: "SARB approval", MXN: "WHT on interest", BDT: "no cross-border sweep" }[x.ccy] || "local"));
+  }
+  h += "</div>";
+  const net = t ? 100 : 58;
+  h += '<section class="panel p-net fade"><div class="ph"><h3>Intercompany settlement · last month</h3><span class="sub">' + (t ? "Bilateral: every invoice settled separately" : "Monthly multilateral netting run by the in-house bank") + '</span></div><div class="bars">' +
+    '<div class="bar2"><span>Gross intercompany invoices (22)</span><div class="trk"><div class="fill" data-w="100" style="background:var(--faint)"></div></div><span class="v">₹100</span></div>' +
+    '<div class="bar2"><span>Cash actually settled</span><div class="trk"><div class="fill" data-w="' + net + '" style="background:' + (t ? "var(--bad-fill)" : "var(--good-fill)") + '"></div></div><span class="v" id="net-v"></span></div></div>' +
+    '<p class="note">' + (t ? "22 cross-border payments, each with an FX spread and bank charges (about 0.25% all-in)." : "Netting removes 60% of eligible settlements; royalties, dividends and interest still settle gross. India joins for trade flows through AD-bank-approved set-off under the FEMA (Export & Import) Regulations 2026. Saves about ₹1.3 Cr a year on ₹840 Cr of eligible flows (Annex E2, lever L4).") + "</p></section>";
+  h += '<section class="panel p-guard fade"><div class="ph"><h3>Guardrails built into the structure</h3></div><ul class="guard">' +
+    [["FEMA", "INR stays onshore; the GRCTC deals with overseas entities as a non-resident"], ["Companies Act", "Domestic sweeps within s.185/186 limits; Board approvals in place"], ["Transfer pricing", "Arm's-length in-house bank rates; pool benefit shared with members (OECD 2020)"], ["Tax", "Withholding tax, thin capitalization and Pillar Two checked per country"], ["Bank risk", "Citi backs up the pool headers; Citi is present in 12 countries"]]
+      .map(g => "<li><b>" + esc(g[0]) + "</b><span>" + esc(g[1]) + "</span></li>").join("") + "</ul></section>";
+  const box = $("#liq"); box.innerHTML = h;
+  glide($("#net-v"), "net", net, v => "₹" + Math.round(v), 1100, 100);
+  later(() => box.querySelectorAll(".fill[data-w]").forEach(f => { f.style.width = f.dataset.w + "%"; }));
+}
+
+/* =====================================================================
+   VALUE SIMULATOR (Annex E3 scenario engine)
+   ===================================================================== */
+const SL = [
+  ["sp", "Spread captured on pooled cash", 1.5, 4.5, 0.05, v => v.toFixed(2) + "%", "Local borrowing cost minus idle yield, net of withholding tax"],
+  ["tr", "Overseas cash trapped in restricted markets", 10, 40, 1, v => Math.round(v) + "%", "Cannot be pooled cross-border"],
+  ["om", "Operating minimum kept locally", 20, 40, 1, v => Math.round(v) + "%", "Share of overseas cash each entity keeps"],
+  ["br", "Buffer reduction from pooling", 10, 30, 1, v => Math.round(v) + "%", "Capped at the 26.4% portfolio effect"],
+  ["fx", "FX execution saving", 3, 20, 1, v => Math.round(v) + " bp", "Central, multi-dealer execution"],
+  ["nc", "Netting cost reduction", 40, 90, 1, v => Math.round(v) + "%", "On eligible intercompany settlements"],
+  ["yu", "Yield uplift from central investing", 10, 50, 1, v => Math.round(v) + " bp", "One policy, tiered portfolio"],
+  ["fp", "Bank fee re-pricing", 0.5, 1.5, 0.05, v => v.toFixed(2) + "×", "Multiplier on the negotiated price cuts"],
+  ["cm", "Cost multiplier, one-time and running", 0.8, 1.4, 0.05, v => v.toFixed(2) + "×", "Above 1 means a cost over-run"],
+  ["wacc", "Discount rate", 9, 14, 0.5, v => v.toFixed(1) + "%", "Cost of capital for the NPV"]
+];
+let sim = Object.assign({}, PRESET.base), preset = "base";
+const TOR = [
+  ["Spread captured on pooled cash", "sp", 2.0, 4.0, v => v.toFixed(1) + "%"],
+  ["Overseas cash trapped", "tr", 35, 15, v => Math.round(v) + "%"],
+  ["Running-cost over-run", "cm", 1.3, 0.7, v => v.toFixed(1) + "×"],
+  ["Yield uplift from central investing", "yu", 15, 45, v => Math.round(v) + " bp"],
+  ["Bank fee re-pricing", "fp", 0.5, 1.5, v => v.toFixed(1) + "×"],
+  ["FX execution saving", "fx", 5, 15, v => Math.round(v) + " bp"],
+  ["Buffer reduction from pooling", "br", 15, 35, v => Math.round(v) + "%"]
+];
+const thumbAt = f => "calc(9px + (100% - 18px) * " + f.toFixed(4) + ")";
+let lastM = null;
+function mountSimulator() {
+  view.innerHTML =
+    '<div class="grid">' +
+    '<section class="panel p-in" aria-label="Assumptions"><div class="ph"><h3>Assumptions you can move</h3><button class="reset" id="reset" type="button">Reset to base case</button></div>' +
+    '<div class="presets" role="group" aria-label="Scenario">' + ["bear", "base", "bull"].map(k => '<button type="button" id="p-' + k + '" aria-pressed="false">' + k + "</button>").join("") + '<button type="button" class="custom" id="p-custom" aria-pressed="false" tabindex="-1" aria-disabled="true">Custom</button></div>' +
+    '<div class="sl"><label id="lab-ramp">Delivery speed</label><output id="o-ramp"></output><div class="rw"><div class="speed" role="group" aria-labelledby="lab-ramp">' +
+    [["slow", "Slow"], ["plan", "As planned"], ["fast", "Fast"]].map(s => '<button type="button" id="r-' + s[0] + '" aria-pressed="false">' + s[1] + "</button>").join("") + '</div></div><small>How quickly levers reach full run-rate (Annex E3 ramps)</small></div>' +
+    SL.map(s => '<div class="sl"><label for="s-' + s[0] + '">' + esc(s[1]) + '</label><output id="o-' + s[0] + '" for="s-' + s[0] + '"></output><div class="rw"><span class="bt" style="left:' + thumbAt((PRESET.base[s[0]] - s[2]) / (s[3] - s[2])) + '" title="Base case"></span><input type="range" id="s-' + s[0] + '" min="' + s[2] + '" max="' + s[3] + '" step="' + s[4] + '"></div><small>' + esc(s[6]) + " · base " + s[5](PRESET.base[s[0]]) + "</small></div>").join("") +
+    '<p class="note">Every other input stays at its Annex E1 value. The formulas are the ones in tab E3 of the Excel annex, so Bear, Base and Bull reproduce the deck: NPV −₹5 / ₹38 / ₹83 Cr.</p></section>' +
+    '<section class="panel p-out" aria-label="Business case">' +
+    '<div class="mets"><div class="met lead"><span class="l">Net value, run-rate</span><span class="v" id="m-net"></span><span class="s" id="m-gross"></span></div>' +
+    '<div class="met"><span class="l">5-year NPV</span><span class="v" id="m-npv"></span><span class="s" id="m-npvpt"></span></div>' +
+    '<div class="met"><span class="l">Payback</span><span class="v" id="m-pay"></span><span class="s" id="m-payy"></span></div>' +
+    '<div class="met"><span class="l">Cash released</span><span class="v" id="m-liq"></span><span class="s">to repay borrowing</span></div></div>' +
+    '<div><div class="subh"><h4>Where the NPV lands</h4><span>₹ Cr, 5 years · red zone = value destroyed</span></div><div class="range" id="rng"></div></div>' +
+    '<div><div class="subh"><h4>Net cash flow by year</h4><span id="cf-s"></span></div><div class="chart" id="cf"></div>' +
+    '<details class="tv"><summary>Table view</summary><div id="cf-t"></div></details></div>' +
+    '<div><div class="subh"><h4>Run-rate value by lever</h4><span><i class="bk"></i>base case · ₹ Cr a year</span></div><div id="levs"></div></div>' +
+    '<div><div class="subh"><h4>What moves net value most</h4><span id="tor-s"></span></div><div class="tor" id="tor"></div></div>' +
+    "</section></div>";
+  SL.forEach(s => {
+    const el = $("#s-" + s[0]);
+    el.addEventListener("input", () => { sim[s[0]] = parseFloat(el.value); preset = matchPreset(); paintSim(); });
+  });
+  ["bear", "base", "bull"].forEach(k => $("#p-" + k).addEventListener("click", () => { sim = Object.assign({}, PRESET[k]); preset = k; paintSim(); }));
+  ["slow", "plan", "fast"].forEach(k => $("#r-" + k).addEventListener("click", () => { sim.ramp = k; preset = matchPreset(); paintSim(); }));
+  $("#reset").addEventListener("click", () => { sim = Object.assign({}, PRESET.base); preset = "base"; paintSim(); });
+  const lo = -30, hi = 130, X = v => (100 * (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)), X0 = X(0);
+  $("#rng").innerHTML = '<div class="ax" style="background:linear-gradient(90deg,var(--bad-bg) 0 ' + X0 + '%,var(--good-bg) ' + X0 + '% 100%)"></div>' +
+    [["Bear", BEAR.npv], ["Base", BASE.npv], ["Bull", BULL.npv]].map(q => '<div class="tk" style="left:' + X(q[1]) + '%"></div><div class="tl" style="left:' + X(q[1]) + '%"><b>' + q[0] + "</b> " + rs(q[1]) + "</div>").join("") +
+    '<div class="dot" id="rng-d"></div><div class="dl" id="rng-l"></div>';
+  paintSim.X = X;
+  watchWidth($("#cf"), () => { if (lastM) cashflow(lastM, false); });
+  paintSim(true);
+}
+function matchPreset() {
+  for (const k of ["bear", "base", "bull"]) { const p = PRESET[k]; if (Object.keys(p).every(f => (typeof p[f] === "number" ? Math.abs(p[f] - sim[f]) < 1e-9 : p[f] === sim[f]))) return k; }
+  return "custom";
+}
+function paintSim(first) {
+  const M = model(sim); lastM = M;
+  ["bear", "base", "bull", "custom"].forEach(k => $("#p-" + k).setAttribute("aria-pressed", preset === k));
+  ["slow", "plan", "fast"].forEach(k => $("#r-" + k).setAttribute("aria-pressed", sim.ramp === k));
+  $("#o-ramp").textContent = { slow: "Slow", plan: "As planned", fast: "Fast" }[sim.ramp];
+  SL.forEach(s => {
+    const el = $("#s-" + s[0]); if (parseFloat(el.value) !== sim[s[0]]) el.value = sim[s[0]];
+    el.style.setProperty("--p", thumbAt((sim[s[0]] - s[2]) / (s[3] - s[2])));
+    $("#o-" + s[0]).textContent = s[5](sim[s[0]]);
+  });
+  const D = first ? 900 : 450, from = first ? 0 : undefined;
+  const net = $("#m-net"); glide(net, "mnet", M.net, v => rs(v, 1) + " Cr", D, from); net.classList.toggle("neg", M.net < 0);
+  $("#m-gross").textContent = "a year · gross " + rs(M.gross, 1) + " less running cost " + rs(M.recur, 1);
+  const npv = $("#m-npv"); glide(npv, "mnpv", M.npv, v => rs(v, 1) + " Cr", D, from); npv.classList.toggle("neg", M.npv < 0);
+  $("#m-npvpt").textContent = "at " + sim.wacc.toFixed(1) + "% · " + rs(M.npvPT, 1) + " after tax";
+  const py = $("#m-pay");
+  if (M.pay === null) { py._tw = null; py.textContent = "> 5 yrs"; py.classList.add("neg"); memo.mpay = 5; $("#m-payy").textContent = "Not within the 5-year horizon"; }
+  else { py.classList.remove("neg"); glide(py, "mpay", M.pay, v => fmt(v, 1) + " yrs", D, from); $("#m-payy").textContent = "about " + Math.round(M.pay * 12) + " months"; }
+  glide($("#m-liq"), "mliq", M.liq, v => "₹" + fmt(v) + " Cr", D, from);
+  const X = paintSim.X, dx = X(M.npv);
+  $("#rng-d").style.left = dx + "%"; const dl = $("#rng-l"); dl.style.left = dx + "%"; dl.textContent = (preset === "custom" ? "Yours " : "") + rs(M.npv, 1);
+  dl.style.color = M.npv < 0 ? "var(--bad)" : "var(--fg)";
+  // levers
+  const maxL = 30, base = BASE.L, lv = $("#levs");
+  if (!lv.children.length) lv.innerHTML = M.L.map((l, i) => '<div class="lev"><span>' + esc(l[0]) + '</span><div class="trk"><div class="fill' + (i === 0 ? " l1" : "") + '"></div><span class="bt" style="left:' + Math.min(100, 100 * base[i][1] / maxL) + '%"></span></div><span class="num" id="lv' + i + '"></span></div>').join("");
+  M.L.forEach((l, i) => {
+    const f = lv.children[i].querySelector(".fill"), w = Math.min(100, 100 * Math.max(0, l[1]) / maxL) + "%";
+    if (first) later(() => { f.style.width = w; }); else f.style.width = w;
+    glide($("#lv" + i), "lv" + i, l[1], v => fmt(v, 1), D, from);
+  });
+  cashflow(M, first);
+  $("#cf-s").textContent = "₹ Cr · 5-year cumulative " + rs(M.cum[4], 1);
+  tornado(M, first);
+}
+/* one-way sensitivity around the current settings (Annex E3 ranges) */
+function tornado(M, first) {
+  const rowsT = TOR.map(d => {
+    const a = model(Object.assign({}, sim, { [d[1]]: d[2] })).net, b = model(Object.assign({}, sim, { [d[1]]: d[3] })).net;
+    return { nm: d[0], key: d[1], range: d[4](d[2]) + " to " + d[4](d[3]), lo: Math.min(a, b), hi: Math.max(a, b) };
+  }).sort((p, q) => (q.hi - q.lo) - (p.hi - p.lo));
+  const S = Math.max(1, ...rowsT.map(r => Math.max(M.net - r.lo, r.hi - M.net)));
+  $("#tor-s").textContent = "one input at a time, around net ₹" + fmt(M.net, 1) + " Cr a year";
+  const box = $("#tor");
+  if (!box.children.length) box.innerHTML = TOR.map((d, i) => '<div class="tr" id="tr' + i + '"><span class="nm"></span><div class="tt"><i class="lo"></i><i class="hi"></i><b class="vl"></b><b class="vh"></b></div></div>').join("");
+  rowsT.forEach((r, i) => {
+    const el = box.children[i], wl = 38 * Math.max(0, M.net - r.lo) / S, wh = 38 * Math.max(0, r.hi - M.net) / S;
+    el.querySelector(".nm").innerHTML = esc(r.nm) + "<small>" + esc(r.range) + "</small>";
+    const lo = el.querySelector(".lo"), hi = el.querySelector(".hi"), vl = el.querySelector(".vl"), vh = el.querySelector(".vh");
+    const set = () => { lo.style.width = wl + "%"; hi.style.width = wh + "%"; vl.style.right = "calc(50% + " + wl + "% + 6px)"; vh.style.left = "calc(50% + " + wh + "% + 6px)"; };
+    vl.textContent = fmt(r.lo, 1); vh.textContent = fmt(r.hi, 1);
+    vl.style.visibility = wl < 0.4 ? "hidden" : ""; vh.style.visibility = wh < 0.4 ? "hidden" : "";
+    if (first) later(set); else set();
+  });
+}
+function cashflow(M, animate) {
+  const box = $("#cf"), W = Math.max(300, Math.round(box.clientWidth || 520)), vals = M.cf;
+  const pl = 34, pr = 10, pt = 26, plotH = W < 460 ? 150 : 178;
+  const mx = Math.max(40, Math.ceil((Math.max(...vals) + 6) / 10) * 10), lo = Math.min(-20, Math.floor((Math.min(0, ...vals) - 10) / 10) * 10);
+  const y = v => pt + plotH * (mx - v) / (mx - lo), slot = (W - pl - pr) / 5, bw = Math.min(50, slot * 0.46), x = i => pl + (i + 0.5) * slot;
+  const yl = pt + plotH + 18, yT = yl + 22, H = yT + 40;
+  let s = "";
+  const step = mx - lo > 80 ? 20 : 10;
+  for (let tk = Math.ceil(lo / step) * step; tk <= mx; tk += step) s += '<line class="grid-l" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(tk) + '" y2="' + y(tk) + '"/><text x="' + (pl - 7) + '" y="' + (y(tk) + 4) + '" text-anchor="end">' + tk + "</text>";
+  s += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="var(--fg)" stroke-width="1.2"/>';
+  vals.forEach((v, i) => {
+    const top = v >= 0 ? y(v) : y(0), h = Math.max(1, Math.abs(y(v) - y(0))), r = Math.min(4, h / 2), xl = x(i) - bw / 2;
+    const col = v < 0 ? "var(--bad-fill)" : (i >= 2 ? "var(--bar-strong)" : "var(--bar-soft)");
+    const d = v >= 0 ? "M" + xl + "," + (top + h) + "V" + (top + r) + "Q" + xl + "," + top + " " + (xl + r) + "," + top + "H" + (xl + bw - r) + "Q" + (xl + bw) + "," + top + " " + (xl + bw) + "," + (top + r) + "V" + (top + h) + "Z"
+                     : "M" + xl + "," + top + "V" + (top + h - r) + "Q" + xl + "," + (top + h) + " " + (xl + r) + "," + (top + h) + "H" + (xl + bw - r) + "Q" + (xl + bw) + "," + (top + h) + " " + (xl + bw) + "," + (top + h - r) + "V" + top + "Z";
+    s += '<path class="col" d="' + d + '" fill="' + col + '" style="transform-origin:' + x(i) + "px " + y(0) + 'px"><title>Year ' + (i + 1) + ": " + rs(v, 1) + " Cr</title></path>";
+    s += '<text x="' + x(i) + '" y="' + (v >= 0 ? top - 7 : top + h + 15) + '" text-anchor="middle" style="fill:' + (v < 0 ? "var(--bad)" : "var(--fg)") + ';font-weight:900;font-size:12.5px">' + (v < 0 ? "−" : "") + fmt(Math.abs(v), 1) + "</text>";
+    s += '<text x="' + x(i) + '" y="' + yl + '" text-anchor="middle">Year ' + (i + 1) + "</text>";
+  });
+  // payback marker on the same time axis as the columns
+  const pay = M.pay, xp = pay === null ? W - pr : pl + Math.min(5, pay) * slot;
+  s += '<rect x="' + pl + '" y="' + yT + '" width="' + (W - pl - pr) + '" height="8" rx="4" fill="var(--track)"/>';
+  s += '<rect x="' + pl + '" y="' + yT + '" width="' + Math.max(0, xp - pl) + '" height="8" rx="4" fill="var(--bad-fill)" opacity=".35"/>';
+  if (pay !== null) s += '<rect x="' + xp + '" y="' + yT + '" width="' + Math.max(0, W - pr - xp) + '" height="8" rx="4" fill="var(--good-fill)"/>';
+  s += '<line x1="' + xp + '" x2="' + xp + '" y1="' + (yT - 7) + '" y2="' + (yT + 15) + '" stroke="var(--fg)" stroke-width="2"/>';
+  const lx = Math.max(pl + 60, Math.min(W - pr - 60, xp));
+  s += '<text x="' + lx + '" y="' + (yT + 30) + '" text-anchor="middle" style="fill:' + (pay === null ? "var(--bad)" : "var(--fg)") + ';font-weight:900;font-size:12px">' + (pay === null ? "No payback within 5 years" : "Pays back in " + fmt(pay, 1) + " years") + "</text>";
+  box.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Column chart: net cash flow by year, ₹ crore, with the payback point">' + s + "</svg>";
+  if (!reduce && animate) box.querySelectorAll(".col").forEach((p, i) => { p.animate([{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }], { duration: 700, delay: i * 80, easing: "cubic-bezier(.2,.75,.2,1)", fill: "both" }); });
+  $("#cf-t").innerHTML = '<table><thead><tr><th>Year</th><th class="n">Net cash flow</th><th class="n">Cumulative</th></tr></thead><tbody>' + vals.map((v, i) => "<tr><td>Year " + (i + 1) + '</td><td class="n">' + rs(v, 1) + '</td><td class="n">' + rs(M.cum[i], 1) + "</td></tr>").join("") + "</tbody></table>";
+}
+
+/* =====================================================================
+   ROUTING
+   ===================================================================== */
+const VIEWS = { cockpit: [mountCockpit, updateCockpit], liquidity: [mountLiquidity, updateLiquidity], simulator: [mountSimulator, () => {}] };
+function show(tab) {
+  if (stage) { stage.destroy(); stage = null; }
+  while (watchers.length) watchers.pop().disconnect();
+  updateCockpit.lastRows = null;
+  ["pv0", "pv1", "pv2", "pv3"].forEach(k => { delete memo[k]; });
+  state.tab = tab; save(); header();
+  VIEWS[tab][0]();
+  VIEWS[tab][1](true);
+  view.firstElementChild && view.firstElementChild.classList.add("fade");
+}
+function setMode(m) { if (state.mode === m) return; state.mode = m; save(); header(); VIEWS[state.tab][1](false); }
+$("#m-today").addEventListener("click", () => setMode("today"));
+$("#m-target").addEventListener("click", () => setMode("target"));
+TABS.forEach(k => $("#t-" + k).addEventListener("click", () => { if (state.tab !== k) show(k); }));
+$(".tabs").addEventListener("keydown", ev => {
+  if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft") return;
+  const i = TABS.indexOf(state.tab), j = (i + (ev.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length;
+  show(TABS[j]); $("#t-" + TABS[j]).focus();
+});
+/* first visit: open on Today, then let the group resolve into One Treasury (skipped if the viewer acts first) */
+if (firstVisit && !hash && !reduce && state.tab === "cockpit") {
+  state.mode = "today"; show("cockpit");
+  let touched = false; const stop = () => { touched = true; };
+  window.addEventListener("pointerdown", stop, { once: true }); window.addEventListener("keydown", stop, { once: true });
+  setTimeout(() => { if (!touched && state.tab === "cockpit" && state.mode === "today") setMode("target"); }, 1800);
+} else show(state.tab);
+window.__model = model; window.__PRESET = PRESET;
+})();
+</script>
+
+</body></html>
